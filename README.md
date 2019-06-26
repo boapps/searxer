@@ -1,16 +1,14 @@
-# searxer
+# Searxer
+Open source mobile app for searching the web.
+Written in flutter.
+Uses the Searx API.
 
-A new Flutter project.
+Features:
+- not just a browser, it shows results like the google search app, except not a spyware
+- many engines (ddg, google, bing, etc.)
+- select the categories you want (some are still WIP)
+- choose any searx instance in the settings (just paste the url)
+- shows seed/peer number when searching torrents, it also has a button for magnet links
+- choose a time interval to find more recent results
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Credits to Adam Tauber ([asciimoo](https://github.com/asciimoo/)) for creating an [awesome metasearch engine](https://github.com/asciimoo/searx).
