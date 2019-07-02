@@ -1,5 +1,5 @@
 class SearchResult {
-  SearchResult(this.url, this.purl, this.title, this.index, this.description,
+  SearchResult(this.url, this.purl, this.title, this.description,
       {this.engine,
       this.engines,
       this.leech,
@@ -13,7 +13,6 @@ class SearchResult {
   String url;
   String purl; //pretty url
   String title;
-  int index;
   String description;
   String engine;
   String magnet; //magnet link for torrents

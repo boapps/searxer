@@ -1,20 +1,21 @@
+import 'dart:io';
+
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:searxer/SearchResult.dart';
-import 'package:searxer/SettingsPage.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:format_bytes/format_bytes.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:searxer/SearchResult.dart';
+import 'package:searxer/Searx.dart' as prefix0;
+import 'package:searxer/SettingsPage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'ImageView.dart';
 import 'Searx.dart';
 import 'Settings.dart';
-import 'ImageView.dart';
-
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,19 +25,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Searxer',
+      title: 'searxer',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Searxer'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -54,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _page = 0;
 
   void initPrefs() async {
-    baseURL = await Settings().getURL();
+    searxURL = await Settings().getURL();
   }
 
   @override
@@ -212,11 +211,29 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () {
                 showFilterDialog();
               }),
-          new IconButton(
-              icon: Icon(Icons.category),
-              onPressed: () {
-                showCategoryDialog();
-              }),
+          new PopupMenuButton(
+            itemBuilder: (context) {
+              return CATEGORY_LIST.keys.map((String categoryName) {
+                return PopupMenuItem(
+                  child: Row(children: <Widget>[
+                    Container(child: new Icon(CATEGORY_LIST[categoryName]), padding: EdgeInsets.only(right: 10),),
+                    new Text(
+                      categoryName,
+                    ),
+                  ]),
+                  value: categoryName,
+                );
+              }).toList();
+            },
+            icon: new Icon(CATEGORY_LIST[selectedCategory]),
+            onSelected: (String categoryName) {
+              selectedCategory = categoryName;
+              setState(() {
+                search(searchTerm);
+              });
+            },
+            tooltip: "Category",
+          ),
           new PopupMenuButton(
             itemBuilder: (context) {
               return Searx.TIME_RANGE_NAMES.map((String range) {
@@ -224,9 +241,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: new Text(
                     range,
                     style: TextStyle(
-                        fontWeight: (Searx.TIME_RANGE_NAMES[timeRange] == range)
-                            ? FontWeight.bold
-                            : FontWeight.normal),
+                        fontWeight:
+                            (Searx.TIME_RANGE_NAMES[selectedTimeRange] == range)
+                                ? FontWeight.bold
+                                : FontWeight.normal),
                   ),
                   value: range,
                 );
@@ -234,7 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             icon: new Icon(Icons.date_range),
             onSelected: (String range) {
-              timeRange = Searx.TIME_RANGE_NAMES.indexOf(range);
+              selectedTimeRange = Searx.TIME_RANGE_NAMES.indexOf(range);
               setState(() {
                 search(searchTerm);
               });
@@ -332,28 +350,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void search(String text, {int page = 0}) async {
-    _page = page;
     setState(() {
       progress = null;
     });
+
+    _page = page;
     searchTerm = text;
     if (page == 0) results.clear();
-    if (searchTerm != null && searchTerm != "")
-      results.addAll(await Searx().getSearchResults(searchTerm, page: page));
+    if (searchTerm != "")
+      results.addAll(await Searx().getSearchResults(searchTerm, page));
     setState(() {
       progress = 0;
-    });
-  }
-
-  Future<bool> showCategoryDialog() {
-    return showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (BuildContext context) {
-        return new CategoryDialog();
-      },
-    ).then((var a) {
-      search(searchTerm);
     });
   }
 
@@ -367,38 +374,6 @@ class _MyHomePageState extends State<MyHomePage> {
     ).then((var a) {
       search(searchTerm);
     });
-  }
-}
-
-class CategoryDialog extends StatefulWidget {
-  @override
-  CategoryDialogState createState() => new CategoryDialogState();
-}
-
-class CategoryDialogState extends State<CategoryDialog> {
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> children = new List();
-    children.addAll(categories.keys.map((String category) {
-      return new CheckboxListTile(
-        value: categories[category],
-        onChanged: (bool state) {
-          setState(() {
-            categories.update(category, (bool a) => state);
-          });
-        },
-        title: new Text(category),
-      );
-    }).toList());
-    children.add(new FlatButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: new Text("Apply")));
-    return SimpleDialog(
-      title: new Text("Categories"),
-      children: children,
-    );
   }
 }
 

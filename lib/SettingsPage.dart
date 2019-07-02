@@ -44,7 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           new ListTile(
             title: new Text("Searx URL:"),
-            trailing: new Text(baseURL),
+            trailing: new Text(searxURL),
             onTap: () {
               return showDialog(
                 barrierDismissible: true,
@@ -72,14 +72,14 @@ class SearxURLDialogState extends State<SearxURLDialog> {
   @override
   Widget build(BuildContext context) {
     TextEditingController controller = new TextEditingController();
-    controller.text = baseURL;
+    controller.text = searxURL;
 
     return SimpleDialog(
       title: new Text("Searx engine URL"),
       children: [
         new TextField(
           onChanged: (String url) {
-            baseURL = url;
+            searxURL = url;
           },
           autofocus: true,
           controller: controller,
@@ -87,7 +87,7 @@ class SearxURLDialogState extends State<SearxURLDialog> {
         new FlatButton(
             onPressed: () {
               Navigator.pop(context);
-              Settings().setURL(baseURL);
+              Settings().setURL(searxURL);
             },
             child: new Text("OK"))
       ],

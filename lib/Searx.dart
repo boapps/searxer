@@ -1,15 +1,32 @@
 library searxer.Searx;
 
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:searxer/SearchResult.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'package:xml/xml.dart' as xml;
-import 'package:fluttertoast/fluttertoast.dart';
 
-int timeRange = 0;
-String baseURL = "https://searx.site";
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:searxer/SearchResult.dart';
+import 'package:xml/xml.dart' as xml;
+
+const Map<String, IconData> CATEGORY_LIST = {
+  "general": Icons.category,
+  "science": Icons.explore,
+  "it": Icons.computer,
+  "videos": Icons.videocam,
+  "images": Icons.image,
+  "files": Icons.folder,
+  "music": Icons.music_note,
+  "news": Icons.live_tv,
+  "map": Icons.map,
+  "social media": Icons.person,
+};
+const String GOOGLE_AUTOCOMPLETE_URL =
+    "https://suggestqueries.google.com/complete/search?client=toolbar&q=";
+
+int selectedTimeRange = 0;
+String selectedCategory = CATEGORY_LIST.keys.first;
+String searxURL = "https://searx.site";
 List<String> suggestions = new List();
 
 Map<String, bool> categories = {
@@ -108,7 +125,7 @@ Map<String, bool> engines = {
 
 class Searx {
   String get searchUrl {
-    String link = baseURL + "/search";
+    String link = searxURL + "/search";
     return link;
   }
 
@@ -122,12 +139,7 @@ class Searx {
   }
 
   String get formattedCategories {
-    List categorieList = List();
-    categories.forEach((String key, bool value) {
-      if (value) categorieList.add(key);
-    });
-
-    return categorieList.join(",");
+    return selectedCategory;
   }
 
   void updateEngine(bool state, String engine) {
@@ -154,8 +166,7 @@ class Searx {
     "Year",
   ];
 
-  Future<List<SearchResult>> getSearchResults(String query,
-      {int page = 1}) async {
+  Future<List<SearchResult>> getSearchResults(String query, int page) async {
     List<SearchResult> results = new List();
     var jsonResponse;
     http.Response response = await http.post(
@@ -168,7 +179,7 @@ class Searx {
         "enabled_engines": "",
         "disabled_engines": "",
         "engines": formattedEngines,
-        "time_range": TIME_RANGES[timeRange],
+        "time_range": TIME_RANGES[selectedTimeRange],
       },
     );
     try {
@@ -184,15 +195,13 @@ class Searx {
           textColor: Colors.white,
           fontSize: 16.0);
     }
-    var jsonResults = jsonResponse["results"];
-    int n = 0;
-
     try {
+      var jsonResults = jsonResponse["results"];
+
       for (var jsonResults in jsonResults) {
-        print(jsonResults);
-        String title = jsonResults["title"];
-        String purl = jsonResults["pretty_url"];
         String url = jsonResults["url"];
+        String purl = jsonResults["pretty_url"];
+        String title = jsonResults["title"];
         String description = jsonResults["content"];
         String engine = jsonResults["engine"];
         int leech = jsonResults["leech"] != null
@@ -206,11 +215,12 @@ class Searx {
         String img = jsonResults["img_src"];
         int filesize = jsonResults["filesize"];
         String date = jsonResults["publishedDate"];
+
         List<dynamic> enginesInDynamic = jsonResults["engines"];
         List<String> engines = new List();
         for (dynamic d in enginesInDynamic) engines.add(d as String);
 
-        results.add(new SearchResult(url, purl, title, n, description,
+        results.add(new SearchResult(url, purl, title, description,
             engine: engine,
             engines: engines,
             leech: leech,
@@ -220,30 +230,25 @@ class Searx {
             img: img,
             filesize: filesize,
             date: date));
-        n++;
       }
-    } catch (e) {
-      print(e);
+    } catch (error) {
+      print(error);
     }
 
     return results;
   }
 
   void getAutoComplete(String term) async {
-    http.Response response = await http.get(
-        "https://suggestqueries.google.com/complete/search?client=toolbar&q=" +
-            term);
+    http.Response response = await http.get(GOOGLE_AUTOCOMPLETE_URL + term);
     suggestions.clear();
     var document = xml.parse(response.body);
     List<xml.XmlElement> elements =
         document.findAllElements("suggestion").toList();
     for (xml.XmlElement element in elements) {
-      suggestions.add(element.toString().substring(
-          element.toString().indexOf("\"") + 1,
-          element
-              .toString()
-              .indexOf("\"", element.toString().indexOf("\"") + 1)));
+      int quateIndex = element.toString().indexOf("\"") + 1;
+      suggestions.add(element
+          .toString()
+          .substring(quateIndex, element.toString().indexOf("\"", quateIndex)));
     }
-    print(suggestions);
   }
 }
