@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'Searx.dart';
 import 'Settings.dart';
+import 'CategoriesPage.dart';
 
 class SettingsPage extends StatefulWidget {
-  SettingsPage({Key key, this.title}) : super(key: key);
-
-  final String title;
+  SettingsPage({Key key}) : super(key: key);
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -31,6 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: new Text("Settings"),
       ),
       body: new ListView(
+        padding: EdgeInsets.all(10),
         children: <Widget>[
           new CheckboxListTile(
             value: autoComplete,
@@ -41,6 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
               });
             },
             title: new Text("Auto-complete (with Google)"),
+            subtitle: Text("show possible completions when typing search query"),
           ),
           new ListTile(
             title: new Text("Searx URL:"),
@@ -56,6 +57,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               });
             },
+            subtitle: Text("searx instance to use"),
+          ),
+          new ListTile(
+            title: Text("Categories"),
+            onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CategoriesPage()),
+                );
+            },
+            subtitle: Text("enable/disable engines here"),
           ),
         ],
       ),

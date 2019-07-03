@@ -7,8 +7,160 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:searxer/SearchResult.dart';
+import 'package:searxer/Settings.dart';
 import 'package:xml/xml.dart' as xml;
 
+Map<String, bool> currentEngines = Map();
+
+Future<void> refreshCurrentEngines() async {
+  currentEngines.clear();
+
+  for (String engineName in ENGINES[selectedCategory].keys) {
+    bool enabled = await Settings().getEngine(engineName, selectedCategory);
+
+    currentEngines.putIfAbsent(
+        engineName, () => enabled ?? ENGINES[selectedCategory][engineName]);
+  }
+
+}
+
+const Map<String, Map<String, bool>> ENGINES = {
+  "general": {
+    "archive is": false,
+    "wikipedia": true,
+    "bing": true,
+    "ddg definitions": false,
+    "erowid": false,
+    "wikidata": false,
+    "duckduckgo": true,
+    "etymonline": false,
+    "faroo": false,
+    "gigablast": false,
+    "google": false,
+    "library genesis": false,
+    "qwant": true,
+    "reddit": false,
+    "startpage": true,
+    "yahoo": true,
+    "yandex": false,
+    "dictzone": false,
+    "mymemory translated": false,
+    "Duden": false,
+    "seznam": false,
+    "mojeek": false,
+  },
+  "files": {
+    "digbt": true,
+    "fdroid": false,
+    "google play apps": false,
+    "kickass": true,
+    "nyaa": true,
+    "acgsou": false,
+    "openrepos": false,
+    "piratebay": true,
+    "tokyotoshokan": false,
+    "torrentz": true,
+  },
+  "images": {
+    "bing images": true,
+    "deviantart": true,
+    "duckduckgo images": true,
+    "1x": false,
+    "flickr": false,
+    "frinkiac": false,
+    "google images": false,
+    "nyaa": false,
+    "acgsou": false,
+    "qwant images": true,
+    "reddit": true,
+    "unsplash": true,
+  },
+  "it": {
+    "apk mirror": false,
+    "arch linux wiki": true,
+    "bitbucket": true,
+    "free software directory": true,
+    "gentoo": false,
+    "gitlab": true,
+    "github": true,
+    "geektimes": false,
+    "habrahabr": false,
+    "hoogle": false,
+    "lobste.rs": false,
+    "stackoverflow": true,
+    "searchcode doc": false,
+    "searchcode code": false,
+    "framalibre": false,
+  },
+  "map": {
+    "openstreetmap": true,
+    "photon": false,
+  },
+  "music": {
+    "deezer": true,
+    "digbt": false,
+    "genius": true,
+    "google play music": false,
+    "kickass": false,
+    "mixcloud": false,
+    "nyaa": false,
+    "acgsou": false,
+    "piratebay": false,
+    "soundcloud": true,
+    "spotify": true,
+    "tokyotoshokan": false,
+    "torrentz": false,
+    "youtube": true,
+  },
+  "news": {
+    "bing news": true,
+    "digg": false,
+    "faroo": false,
+    "google news": false,
+    "qwant news": true,
+    "reddit": true,
+    "yahoo news": true,
+  },
+  "science": {
+    "arxiv": true,
+    "base": false,
+    "crossref": false,
+    "google scholar": false,
+    "microsoft academic": true,
+    "openairedatasets": false,
+    "openairepublications": true,
+    "pdbe": true,
+    "pubmed": false,
+    "scanr structures": false,
+    "semantic scholar": false,
+    "wolframalpha": true,
+  },
+  "social media": {
+    "digg": false,
+    "qwant social": true,
+    "reddit": true,
+    "twitter": true,
+    "voat": true,
+  },
+  "videos": {
+    "bing videos": true,
+    "ccc-tv": false,
+    "digbt": false,
+    "google videos": false,
+    "google play movies": false,
+    "ina": false,
+    "kickass": false,
+    "nyaa": false,
+    "acgsou": false,
+    "piratebay": false,
+    "tokyotoshokan": false,
+    "torrentz": false,
+    "youtube": true,
+    "dailymotion": true,
+    "vimeo": true,
+    "1337x": true,
+  }
+};
 const Map<String, IconData> CATEGORY_LIST = {
   "general": Icons.category,
   "science": Icons.explore,
@@ -29,99 +181,7 @@ String selectedCategory = CATEGORY_LIST.keys.first;
 String searxURL = "https://searx.site";
 List<String> suggestions = new List();
 
-Map<String, bool> categories = {
-  "general": true,
-  "science": false,
-  "it": false,
-  "videos": false,
-  "images": false,
-  "files": false,
-  "music": false,
-  "news": false,
-  "map": false,
-  "social media": false,
-};
-
-Map<String, bool> engines = {
-  "1337x": false,
-  "acgsou": false,
-  "apkmirror": false,
-  "archlinux": false,
-  "arxiv": false,
-  "bing_images": false,
-  "bing_news": false,
-  "bing": false,
-  "bing_videos": false,
-  "btdigg": false,
-  "currency_convert": false,
-  "dailymotion": false,
-  "deezer": false,
-  "deviantart": false,
-  "dictzone": false,
-  "digbt": false,
-  "digg": false,
-  "doku": false,
-  "duckduckgo_definitions": false,
-  "duckduckgo_images": false,
-  "duckduckgo": false,
-  "duden": false,
-  "dummy": false,
-  "faroo": false,
-  "fdroid": false,
-  "filecrop": false,
-  "flickr_noapi": false,
-  "flickr": false,
-  "framalibre": false,
-  "frinkiac": false,
-  "genius": false,
-  "gentoo": false,
-  "gigablast": false,
-  "github": false,
-  "google_images": false,
-  "google_news": false,
-  "google": false,
-  "google_videos": false,
-  "ina": false,
-  "json_engine": false,
-  "kickass": false,
-  "mediawiki": false,
-  "microsoft_academic": false,
-  "mixcloud": false,
-  "nyaa": false,
-  "openstreetmap": false,
-  "pdbe": false,
-  "photon": false,
-  "piratebay": false,
-  "pubmed": false,
-  "qwant": false,
-  "reddit": false,
-  "scanr_structures": false,
-  "searchcode_code": false,
-  "searchcode_doc": false,
-  "searx_engine": false,
-  "soundcloud": false,
-  "spotify": false,
-  "stackoverflow": false,
-  "startpage": false,
-  "tokyotoshokan": false,
-  "torrentz": false,
-  "translated": false,
-  "twitter": false,
-  "unsplash": false,
-  "vimeo": false,
-  "wikidata": false,
-  "wikipedia": false,
-  "wolframalpha_api": false,
-  "wolframalpha_noapi": false,
-  "www1x": false,
-  "xpath": false,
-  "yacy": false,
-  "yahoo_news": false,
-  "yahoo": false,
-  "yandex": false,
-  "youtube_api": false,
-  "youtube_noapi": false,
-};
+Map<String, bool> get engines => currentEngines;
 
 class Searx {
   String get searchUrl {
@@ -133,6 +193,14 @@ class Searx {
     List<String> selectedEngines = new List();
     engines.forEach((String engine, bool isSelected) {
       if (isSelected) selectedEngines.add(engine);
+    });
+    return selectedEngines.join(",");
+  }
+
+  String get disabledFormattedEngines {
+    List<String> selectedEngines = new List();
+    engines.forEach((String engine, bool isSelected) {
+      if (!isSelected) selectedEngines.add(engine);
     });
 
     return selectedEngines.join(",");
@@ -167,25 +235,23 @@ class Searx {
   ];
 
   Future<List<SearchResult>> getSearchResults(String query, int page) async {
+    Map<String, dynamic> body = {
+      "format": "json",
+      "q": query,
+      "pageno": (page + 1).toString(),
+      "categories": formattedCategories,
+      //"enabled_engines": formattedEngines,
+      //"disabled_engines": disabledFormattedEngines,
+      "engines": formattedEngines,
+      "time_range": TIME_RANGES[selectedTimeRange],
+    };
     List<SearchResult> results = new List();
     var jsonResponse;
-    http.Response response = await http.post(
-      searchUrl,
-      body: {
-        "format": "json",
-        "q": query,
-        "pageno": (page + 1).toString(),
-        "categories": formattedCategories,
-        "enabled_engines": "",
-        "disabled_engines": "",
-        "engines": formattedEngines,
-        "time_range": TIME_RANGES[selectedTimeRange],
-      },
-    );
+    http.Response response = await http.post(searchUrl, body: body);
     try {
       jsonResponse = json.decode(response.body);
-    } catch (e) {
-      print(e);
+    } catch (error) {
+      print(error);
       Fluttertoast.showToast(
           msg: "error: " + response.body,
           toastLength: Toast.LENGTH_SHORT,

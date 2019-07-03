@@ -9,7 +9,7 @@ import 'package:format_bytes/format_bytes.dart';
 import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:searxer/SearchResult.dart';
-import 'package:searxer/Searx.dart' as prefix0;
+import 'package:searxer/Searx.dart';
 import 'package:searxer/SettingsPage.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -59,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    refreshCurrentEngines();
     initPrefs();
   }
 
@@ -206,17 +207,15 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: new Text("Searxer"),
         actions: <Widget>[
-          new IconButton(
-              icon: Icon(Icons.filter_list),
-              onPressed: () {
-                showFilterDialog();
-              }),
           new PopupMenuButton(
             itemBuilder: (context) {
               return CATEGORY_LIST.keys.map((String categoryName) {
                 return PopupMenuItem(
                   child: Row(children: <Widget>[
-                    Container(child: new Icon(CATEGORY_LIST[categoryName]), padding: EdgeInsets.only(right: 10),),
+                    Container(
+                      child: new Icon(CATEGORY_LIST[categoryName]),
+                      padding: EdgeInsets.only(right: 10),
+                    ),
                     new Text(
                       categoryName,
                     ),
@@ -228,8 +227,10 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: new Icon(CATEGORY_LIST[selectedCategory]),
             onSelected: (String categoryName) {
               selectedCategory = categoryName;
-              setState(() {
-                search(searchTerm);
+              refreshCurrentEngines().then((void nothing) {
+                setState(() {
+                  search(searchTerm);
+                });
               });
             },
             tooltip: "Category",
@@ -362,49 +363,5 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       progress = 0;
     });
-  }
-
-  Future<bool> showFilterDialog() {
-    return showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (BuildContext context) {
-        return new FilterDialog();
-      },
-    ).then((var a) {
-      search(searchTerm);
-    });
-  }
-}
-
-class FilterDialog extends StatefulWidget {
-  @override
-  FilterDialogState createState() => new FilterDialogState();
-}
-
-class FilterDialogState extends State<FilterDialog> {
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> children = new List();
-    children.addAll(engines.keys.map((String engine) {
-      return new CheckboxListTile(
-        value: engines[engine],
-        onChanged: (bool state) {
-          setState(() {
-            engines.update(engine, (bool a) => state);
-          });
-        },
-        title: new Text(engine),
-      );
-    }).toList());
-    children.add(new FlatButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        child: new Text("Apply")));
-    return SimpleDialog(
-      title: new Text("Searx engines"),
-      children: children,
-    );
   }
 }
