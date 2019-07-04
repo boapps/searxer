@@ -12,12 +12,14 @@ import 'package:searxer/SearchResult.dart';
 import 'package:searxer/Searx.dart';
 import 'package:searxer/SettingsPage.dart';
 import 'package:url_launcher/url_launcher.dart';
+//adimport
 
 import 'ImageView.dart';
 import 'Searx.dart';
 import 'Settings.dart';
 
 void main() {
+//adinit
   runApp(MyApp());
 }
 
@@ -51,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
   ScrollController _scrollController =
       new ScrollController(keepScrollOffset: false);
   int _page = 0;
+//advar
 
   void initPrefs() async {
     searxURL = await Settings().getURL();
@@ -58,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+//adsetup
     super.initState();
     refreshCurrentEngines();
     initPrefs();
@@ -344,6 +348,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
+//adcont
           ],
         ),
       ),
