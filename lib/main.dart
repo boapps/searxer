@@ -266,7 +266,8 @@ class _MyHomePageState extends State<MyHomePage> {
           new IconButton(
               icon: Icon(Icons.settings),
               onPressed: () {
-                Navigator.push(
+//addispose
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => SettingsPage()),
                 );
@@ -353,6 +354,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   void search(String text, {int page = 0}) async {

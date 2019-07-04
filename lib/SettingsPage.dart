@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'Searx.dart';
 import 'Settings.dart';
 import 'CategoriesPage.dart';
+import 'main.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);
@@ -23,9 +24,18 @@ class _SettingsPageState extends State<SettingsPage> {
     initSettings();
   }
 
+  Future<bool> back() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MyHomePage()),
+    );    
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return new WillPopScope(
+      onWillPop: back,
+      child: Scaffold(
       appBar: AppBar(
         title: new Text("Settings"),
       ),
@@ -71,7 +81,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-    );
+    ),);
   }
 }
 
