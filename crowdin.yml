@@ -1,0 +1,3 @@
+files:
+  - source: /res/values/
+    translation: /res/values/strings_%two_letters_code%.arb
