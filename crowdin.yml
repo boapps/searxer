@@ -1,3 +1,8 @@
 files:
   - source: /res/values/
+    ignore:
+      - /res/values/*_hu.arb
+      - /res/values/*_es.arb
+      - /res/values/*_fr.arb
+      - /res/values/*_it.arb
     translation: /res/values/strings_%two_letters_code%.arb
