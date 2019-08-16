@@ -3,6 +3,7 @@ import 'Searx.dart';
 import 'Settings.dart';
 import 'CategoriesPage.dart';
 import 'main.dart';
+import 'generated/i18n.dart';
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key}) : super(key: key);
@@ -37,7 +38,7 @@ class _SettingsPageState extends State<SettingsPage> {
       onWillPop: back,
       child: Scaffold(
       appBar: AppBar(
-        title: new Text("Settings"),
+        title: new Text(S.of(context).title_settings),
       ),
       body: new ListView(
         padding: EdgeInsets.all(10),
@@ -50,11 +51,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 Settings().setAutoComplete(isAuto);
               });
             },
-            title: new Text("Auto-complete (with Google)"),
-            subtitle: Text("show possible completions when typing search query"),
+            title: new Text(S.of(context).settings_autocomplete),
+            subtitle: Text(S.of(context).settings_autocomplete_summary),
           ),
           new ListTile(
-            title: new Text("Searx URL:"),
+            title: new Text(S.of(context).settings_url),
             trailing: new Text(searxURL),
             onTap: () {
               return showDialog(
@@ -67,17 +68,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 setState(() {});
               });
             },
-            subtitle: Text("searx instance to use"),
+            subtitle: Text(S.of(context).settings_url_summary),
           ),
           new ListTile(
-            title: Text("Categories"),
+            title: Text(S.of(context).settings_category),
             onTap: (){
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => CategoriesPage()),
                 );
             },
-            subtitle: Text("enable/disable engines here"),
+            subtitle: Text(S.of(context).settings_category_summary),
           ),
         ],
       ),
@@ -97,7 +98,7 @@ class SearxURLDialogState extends State<SearxURLDialog> {
     controller.text = searxURL;
 
     return SimpleDialog(
-      title: new Text("Searx engine URL"),
+      title: new Text(S.of(context).dialog_url),
       children: [
         new TextField(
           onChanged: (String url) {
@@ -111,7 +112,7 @@ class SearxURLDialogState extends State<SearxURLDialog> {
               Navigator.pop(context);
               Settings().setURL(searxURL);
             },
-            child: new Text("OK"))
+            child: new Text(S.of(context).ok))
       ],
       contentPadding: EdgeInsets.all(10),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Searx.dart';
 import 'CategoryPage.dart';
+import 'generated/i18n.dart';
 
 class CategoriesPage extends StatefulWidget {
   CategoriesPage({Key key}) : super(key: key);
@@ -19,12 +20,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: new Text("Categories"),
+        title: new Text(S.of(context).settings_category),
       ),
       body: new ListView.builder(
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(CATEGORY_LIST.keys.toList()[index]),
+            title: Text(CATEGORY_NAMES(context)[CATEGORY_LIST.keys.toList()[index]]),
             onTap: () {
               Navigator.push(
                 context,

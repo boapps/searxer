@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:searxer/SearchResult.dart';
 import 'package:searxer/Settings.dart';
 import 'package:xml/xml.dart' as xml;
+import 'generated/i18n.dart';
 
 Map<String, bool> currentEngines = Map();
 
@@ -173,6 +174,20 @@ const Map<String, IconData> CATEGORY_LIST = {
   "map": Icons.map,
   "social media": Icons.person,
 };
+
+Map<String, String> CATEGORY_NAMES(context) => {
+  "general": S.of(context).category_general,
+  "science": S.of(context).category_science,
+  "it": S.of(context).category_it,
+  "videos": S.of(context).category_videos,
+  "images": S.of(context).category_images,
+  "files": S.of(context).category_files,
+  "music": S.of(context).category_music,
+  "news": S.of(context).category_news,
+  "map": S.of(context).category_map,
+  "social media": S.of(context).category_social_media,
+};
+
 const String GOOGLE_AUTOCOMPLETE_URL =
     "https://suggestqueries.google.com/complete/search?client=toolbar&q=";
 
@@ -226,12 +241,12 @@ class Searx {
     "year",
   ];
 
-  static const List<String> TIME_RANGE_NAMES = [
-    "Any",
-    "Day",
-    "Week",
-    "Month",
-    "Year",
+  static List<String> TIME_RANGE_NAMES(context) => [
+    S.of(context).time_any,
+    S.of(context).time_day,
+    S.of(context).time_week,
+    S.of(context).time_month,
+    S.of(context).time_year,
   ];
 
   Future<List<SearchResult>> getSearchResults(String query, int page) async {

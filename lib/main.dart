@@ -12,6 +12,8 @@ import 'package:searxer/SearchResult.dart';
 import 'package:searxer/Searx.dart';
 import 'package:searxer/SettingsPage.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'generated/i18n.dart';
 //adimport
 
 import 'ImageView.dart';
@@ -24,9 +26,19 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  static MaterialLocalizations of(BuildContext context) {
+    return Localizations.of<MaterialLocalizations>(context, MaterialLocalizations);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,],
+      supportedLocales: S.delegate.supportedLocales,
+      localeResolutionCallback: S.delegate.resolution(fallback: new Locale("en", "")),
       title: 'searxer',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -189,7 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
             search(searchTerm, page: _page);
           },
           icon: new Icon(Icons.more_horiz),
-          label: new Text("more"));
+          label: new Text(S.of(context).more_results));
     else
       return new Container();
   }
@@ -200,8 +212,6 @@ class _MyHomePageState extends State<MyHomePage> {
         url,
         enableJavaScript: true,
       );
-    } else {
-      throw 'Could not launch url: ' + url;
     }
   }
 
@@ -209,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: new Text("Searxer"),
+        title: new Text(S.of(context).title_app),
         actions: <Widget>[
           new PopupMenuButton(
             itemBuilder: (context) {
@@ -221,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: EdgeInsets.only(right: 10),
                     ),
                     new Text(
-                      categoryName,
+                      CATEGORY_NAMES(context)[categoryName],
                     ),
                   ]),
                   value: categoryName,
@@ -237,17 +247,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 });
               });
             },
-            tooltip: "Category",
+            tooltip: S.of(context).menu_category,
           ),
           new PopupMenuButton(
             itemBuilder: (context) {
-              return Searx.TIME_RANGE_NAMES.map((String range) {
+              return Searx.TIME_RANGE_NAMES(context).map((String range) {
                 return PopupMenuItem(
                   child: new Text(
                     range,
                     style: TextStyle(
                         fontWeight:
-                            (Searx.TIME_RANGE_NAMES[selectedTimeRange] == range)
+                            (Searx.TIME_RANGE_NAMES(context)[selectedTimeRange] == range)
                                 ? FontWeight.bold
                                 : FontWeight.normal),
                   ),
@@ -256,8 +266,9 @@ class _MyHomePageState extends State<MyHomePage> {
               }).toList();
             },
             icon: new Icon(Icons.date_range),
+            tooltip: S.of(context).menu_time,
             onSelected: (String range) {
-              selectedTimeRange = Searx.TIME_RANGE_NAMES.indexOf(range);
+              selectedTimeRange = Searx.TIME_RANGE_NAMES(context).indexOf(range);
               setState(() {
                 search(searchTerm);
               });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Searx.dart';
 import 'Settings.dart';
+import 'generated/i18n.dart';
 
 class CategoryPage extends StatefulWidget {
   CategoryPage(this.categoryName, {Key key}) : super(key: key);
@@ -37,7 +38,7 @@ class _CategoryPageState extends State<CategoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: new Text(widget.categoryName),
+        title: new Text(CATEGORY_NAMES(context)[widget.categoryName]),
       ),
       body: new ListView.builder(
         itemBuilder: (BuildContext context, int index) {
