@@ -1,6 +1,6 @@
-# Searxer
+# searxer
 Open source mobile app for searching the web.
-Written in flutter.
+Written using flutter.
 Uses the Searx API.
 
 Features:
