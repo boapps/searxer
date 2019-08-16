@@ -5,4 +5,5 @@ files:
       - /res/values/*_es.arb
       - /res/values/*_fr.arb
       - /res/values/*_it.arb
+      - /res/values/*_de.arb
     translation: /res/values/strings_%two_letters_code%.arb
